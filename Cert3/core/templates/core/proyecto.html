@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+
+{% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
+{% block content %}
+
+<div class="container-fluid" style="background-color: #074469; height: 100vh; width: auto;">
+<h2 class="text-center text-white">Nuevo Proyecto</h2>
+<div class="container">
+<form action="{% url 'nuevo_proyecto' %}" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="txtEstudiante" class="form-label text-white">Estudiante</label>
+        <input type="text" class="form-control" id="txtEstudiante" name="txtEstudiante">
+      </div>
+      <div class="mb-3">
+        <label for="txtProyecto" class="form-label text-white">Nombre proyecto</label>
+        <input type="text" class="form-control" id="txtProyecto" name="txtProyecto">
+      </div>
+      <div class="mb-3">
+        <label for="txtTema" class="form-label text-white">Tema</label>
+        <textarea class="form-control" id="txtTema" name="txtTema" rows="3"></textarea>
+      </div>
+      <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300; value="Enviar">
+      <a href="{% url 'home' %}" >Volver</a>
+      
+
+</form>
+</div>
+</div>
+
+{% endblock %}

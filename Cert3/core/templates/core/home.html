@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+
+{% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
+{% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+    <img class="navbar-image" src="{% static 'images/Barra Colores.png' %}" alt="">
+    <span class="navbar-brand mb-0 h1">USM SVM</span>
+
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse position-relative" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item text-center">
+                        <a class="nav-link" href="{% url 'exit' %}">Cerrar Sesion</a>
+                    </li>
+                    {%endif%}
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+{% if user.is_authenticated %}
+
+<section id="proyectos">
+
+    <div class="container">
+        <div class="text-center" style="margin-top: 10vh;">
+            <div class="row">
+                <div class="col">
+                    <h3 style="color: #e5b300; margin-bottom: -2vh;">Portafolio</h3>
+                    <h1 style="margin-top: 2px;">Proyectos presentados</h1>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="window.location.href='{% url 'nuevo_proyecto' %}'" class="btn btn-primary float-end"
+            style="background-color: #074469; border-color: #074469;">Nuevo registro</button>
+
+        <button onclick="window.location.href='{% url 'listar_Proyectos' %}'" class="btn btn-primary float-end"
+            style="background-color: #074469; border-color: #074469; margin-left: 20px;">Ver iniciativas</button>
+        <table class="table table-striped" style="margin-top: 5vh; margin-bottom: 10vh;">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre de Proyecto</th>
+                    <th scope="col">Profesor</th>
+                    <th scope="col">Tema</th>
+                    <th scope="col">Estudiante</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                    <td>{{ proyecto.proy }}</td>
+                    <td>{{ proyecto.profesor }}</td>
+                    <td>{{ proyecto.tema }}</td>
+                    <td>{{ proyecto.estudiante }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% else %}
+<section id="login">
+    {% include 'registration/login.html' %}
+</section>
+{% endif %}
+
+
+{% endblock %}

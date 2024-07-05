@@ -1,0 +1,81 @@
+.navbar-custom {
+    background-color: #005e90;
+    position: relative; /* Ajusta la posición relativa para que los elementos hijos se posicionen correctamente */
+    height: 50px; /* Ajusta la altura de la barra de navegación según sea necesario */
+}
+
+.navbar-custom .navbar-image {
+    position: absolute; /* Ajusta la posición absoluta para que la imagen se ajuste dentro de la barra de navegación */
+    top: 0; /* Alinea la parte superior de la imagen con la parte superior de la barra de navegación */
+    left: 0; /* Alinea la parte izquierda de la imagen con la parte izquierda de la barra de navegación */
+    height: 100%; /* Ajusta la altura de la imagen para que ocupe toda la altura de la barra de navegación */
+    max-width: 100%; /* Establece el ancho máximo de la imagen para evitar que se desborde de la barra de navegación */
+    padding: 0; /* Agrega un relleno interno para mantener un espacio adecuado entre la imagen y los bordes de la barra de navegación */
+    box-sizing: border-box; /* Ajusta el modelo de caja para incluir el relleno en el cálculo del ancho total */
+}
+.navbar-custom .navbar-brand {
+    color: white !important;
+    margin-left: 25px;
+    flex-grow: 1; /* Permite que la marca de la barra de navegación crezca para ocupar el espacio restante */
+    position: relative; /* Establece la posición relativa para el texto de la marca */
+    z-index: 2; /* Asegura que el texto de la marca esté sobre la imagen */
+}
+@media (max-width: 991.98px) {
+    .navbar-custom .navbar-collapse {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #f8f9fa; /* Fondo del menú desplegable */
+        z-index: 1000; /* Para que el menú desplegable esté encima del contenido */
+        width: max-content; /* Para ajustar el ancho al contenido */
+    }
+}
+.navbar-custom .navbar-nav .nav-link {
+    color: white; /* Cambia el color del texto de los elementos del menú */
+}
+
+.img-container {
+    overflow: hidden;
+    height: 100vh;
+    max-height: 100%;
+    position: relative;
+}
+
+.img {
+    display: block;
+    width: auto;
+    min-width: 50vw;
+    height: auto;
+    position: absolute;
+    top: -30vh; /* Ajustar la posición vertical a la parte superior del contenedor */
+    left: 50%; /* Centrar horizontalmente la imagen */
+    transform: translateX(-50%); /* Centrar horizontalmente la imagen */
+    object-position: center top; /* Mostrar la parte superior de la imagen */
+    object-fit: cover;
+}
+
+ .position-absolutes {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    font-size: 2.5vw; /* Tamaño de fuente relativo */
+    min-width: 80vw;
+}
+/* Ajustar el tamaño de fuente del título */
+.position-absolutes h1 {
+    font-size: 4vw; /* Tamaño de fuente relativo */
+    margin-bottom: 0; /* Eliminar el margen inferior predeterminado */
+}
+.outer-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    max-width: 400px;
+  }
