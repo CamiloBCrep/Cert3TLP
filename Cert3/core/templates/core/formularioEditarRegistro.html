@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+
+{% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
+{% block content %}
+<br>
+<br>
+
+<div class="container-fluid" style="background-color: #074469; height: 100vh; width: auto;">
+    <br>
+    <h2 class="text-center text-white">Editar Registro</h2>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+            <div class="mb-3">
+                <label for="txtLitros" class="form-label text-white">Litros:</label>
+                <input type="text" class="form-control" id="txtLitros" name="txtLitros">
+            </div>
+            <div class="mb-3">
+                <label for="cmbCodigo" class="form-label text-white">Codigo:</label><br>
+                <select id="cmbCodigo" name="cmbCodigo" required>
+                {% for choice in CODIGO_CHOICES %}
+                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+                </select>
+                <br><br>
+            </div>
+
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300;" value="Guardar">
+                <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}

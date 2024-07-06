@@ -21,9 +21,11 @@ from core import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'), 
-    path ('login/', views.login, name="login"),  
+    path ('login/', views.login_view, name="login_view"),  
     path('accounts/',  include('django.contrib.auth.urls')),  
     path('logout/', views.exit, name="exit" ),
-    path('nuevo_proyecto/', views.new_proyecto, name="nuevo_proyecto"),
-    path('home/', views.listar_proyectos, name='listar_Proyectos' ),
+    path('nuevoRegistro/', views.crear_registro, name="crear_registro"),
+    path('editarRegistro/<int:pk>/', views.editar_registro, name='editar_registro'),
+    path('home/', views.listar_registros, name='listar_registros' ),   
+    path('api/', include('restAPI.urls')),
 ]

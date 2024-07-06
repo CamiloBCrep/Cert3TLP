@@ -1,19 +1,20 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 
+CODIGO_CHOICES = (
+    ('PRG', 'PRG'),
+    ('PRD', 'PRD'),
+    ('PRA', 'PRA'),
+    ('RPG','RPG')
+)
+TURNO_CHOICES = (('AM','AM'),
+                 ('PM','PM'),
+                 ('MM','MM')
+)
 
-
-class nuevo_proyecto(models.Model):
-    estudiante=models.TextField(max_length=50)
-    profesor=models.TextField(max_length=50, null=True)
-    proy=models.TextField(max_length=255)
-    tema=models.TextField(max_length=50)
-
-CODIGO_CHOICES = (('PRG'),('PRD'),('PRA'))
-TURNO_CHOICES = (('AM'),('PM'),('MM'))
-
-class combustible(model.Model):
-    codigo = models.ChoiceField(
+class combustible(models.Model):
+    codigo = models.CharField(
         max_length=3,
         choices=CODIGO_CHOICES,
         default='-'
@@ -21,8 +22,11 @@ class combustible(model.Model):
     litros = models.IntegerField()
     fecha_hora = models.DateTimeField(auto_now_add=True)
     operario = models.ForeignKey(User, on_delete=models.CASCADE)
-    turno = models.ChoiceField(
+    turno = models.CharField(
         max_length=2,
         choices=TURNO_CHOICES,
         default='-'
     )
+
+    def __str__(self):
+        return f'{self.codigo} - {self.fecha_hora.strftime("%d-%m-%Y %H:%M")}'

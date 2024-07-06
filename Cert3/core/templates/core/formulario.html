@@ -5,29 +5,47 @@
 {% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
 {% block content %}
 
+<br>
+<br>
+
 <div class="container-fluid" style="background-color: #074469; height: 100vh; width: auto;">
-<h2 class="text-center text-white">Nuevo Proyecto</h2>
+  <br>
+<h2 class="text-center text-white">Crear Nueva Categoría</h2>
 <div class="container">
-<form action="{% url 'nuevo_proyecto' %}" method="post">
+  <div class="row justify-content-center">
+    <div class="col-md-4">
+
+<form action="{% url 'crear_registro' %}" method="post">
     {% csrf_token %}
     <div class="mb-3">
-        <label for="txtEstudiante" class="form-label text-white">Estudiante</label>
-        <input type="text" class="form-control" id="txtEstudiante" name="txtEstudiante">
+        <label for="txtLitros" class="form-label text-white">Litros:</label>
+        <input type="text" class="form-control" id="txtLitros" name="txtLitros">
       </div>
       <div class="mb-3">
-        <label for="txtProyecto" class="form-label text-white">Nombre proyecto</label>
-        <input type="text" class="form-control" id="txtProyecto" name="txtProyecto">
-      </div>
-      <div class="mb-3">
-        <label for="txtTema" class="form-label text-white">Tema</label>
-        <textarea class="form-control" id="txtTema" name="txtTema" rows="3"></textarea>
+        <label for="cmbCodigo" class="form-label text-white">Codigo:</label><br>
+        <select id="cmbCodigo" name="cmbCodigo" required>
+          {% for choice in CODIGO_CHOICES %}
+            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+        <br><br>
       </div>
       <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300; value="Enviar">
-      <a href="{% url 'home' %}" >Volver</a>
+      <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
       
 
 </form>
 </div>
 </div>
+</div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
 {% endblock %}

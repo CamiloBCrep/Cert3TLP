@@ -15,6 +15,29 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <img class="navbar-image" src="{% static 'images/Barra Colores.png' %}" alt="">
+        <span class="navbar-brand mb-0 h1">USM SVM</span>
+    
+    
+    
+        <div class="row">
+            <div class="col-md-6">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse position-relative" id="navbarNav">
+                    <ul class="navbar-nav">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item text-center">
+                            <a class="nav-link" href="{% url 'exit' %}">Cerrar Sesion</a>
+                        </li>
+                        {%endif%}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
     {% block content %}
     
 

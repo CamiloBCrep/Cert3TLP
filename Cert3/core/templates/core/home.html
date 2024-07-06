@@ -5,34 +5,10 @@
 {% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
 {% block content %}
 
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
-    <img class="navbar-image" src="{% static 'images/Barra Colores.png' %}" alt="">
-    <span class="navbar-brand mb-0 h1">USM SVM</span>
-
-
-
-    <div class="row">
-        <div class="col-md-6">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse position-relative" id="navbarNav">
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item text-center">
-                        <a class="nav-link" href="{% url 'exit' %}">Cerrar Sesion</a>
-                    </li>
-                    {%endif%}
-                </ul>
-            </div>
-        </div>
-    </div>
-</nav>
 
 {% if user.is_authenticated %}
 
 <section id="proyectos">
-
     <div class="container">
         <div class="text-center" style="margin-top: 10vh;">
             <div class="row">
@@ -42,28 +18,46 @@
                 </div>
             </div>
         </div>
-        
-        <button onclick="window.location.href='{% url 'nuevo_proyecto' %}'" class="btn btn-primary float-end"
-            style="background-color: #074469; border-color: #074469;">Nuevo registro</button>
-
-        <button onclick="window.location.href='{% url 'listar_Proyectos' %}'" class="btn btn-primary float-end"
-            style="background-color: #074469; border-color: #074469; margin-left: 20px;">Ver iniciativas</button>
-        <table class="table table-striped" style="margin-top: 5vh; margin-bottom: 10vh;">
+    
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'crear_registro' %}" class="btn btn-primary me-2"
+                    style="background-color: #074469; border-color: #074469;">Nuevo registro</a>
+    
+            <a href="?filtro=todos" class="btn btn-primary me-2 {% if not filtro_actual %}active{% endif %}"
+                    style="background-color: #074469; border-color: #074469;">Todos los registros</a>
+    
+            <a href="?filtro=mis_registros" class="btn btn-primary {% if filtro_actual == 'mis_registros' %}active{% endif %}"
+                    style="background-color: #074469; border-color: #074469;">Mis registros</a>
+        </div>
+    
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Nombre de Proyecto</th>
-                    <th scope="col">Profesor</th>
-                    <th scope="col">Tema</th>
-                    <th scope="col">Estudiante</th>
+                    <th scope="col">Código</th>
+                    <th scope="col">Litros</th>
+                    <th scope="col">Fecha y hora</th>
+                    <th scope="col">Operario</th>
+                    <th scope="col">Turno</th>
+                    <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for proyecto in proyectos %}
+                {% for registro in registros %}
                 <tr>
-                    <td>{{ proyecto.proy }}</td>
-                    <td>{{ proyecto.profesor }}</td>
-                    <td>{{ proyecto.tema }}</td>
-                    <td>{{ proyecto.estudiante }}</td>
+                    <td>{{ registro.codigo }}</td>
+                    <td>{{ registro.litros }}</td>
+                    <td>{{ registro.fecha_hora }}</td>
+                    <td>{{ registro.operario }}</td>
+                    <td>{{ registro.turno }}</td>
+                    <td>
+                        {% if registro.operario == request.user %}
+                            <a href="{% url 'editar_registro' registro.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No se encontraron registros.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -72,9 +66,18 @@
 </section>
 
 {% else %}
+
 <section id="login">
     {% include 'registration/login.html' %}
 </section>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 {% endif %}
 
 
