@@ -7,45 +7,87 @@
 
 <br>
 <br>
-
 <div class="container-fluid" style="background-color: #074469; height: 100vh; width: auto;">
   <br>
-<h2 class="text-center text-white">Crear Nueva Categoría</h2>
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-
-<form action="{% url 'crear_registro' %}" method="post">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="txtLitros" class="form-label text-white">Litros:</label>
-        <input type="text" class="form-control" id="txtLitros" name="txtLitros">
+  <h2 class="text-center text-white">Crear Nuevo Registro</h2>
+  <div class="container">
+      <div class="row justify-content-center">
+          <div class="col-md-4">
+              <form id="crearRegistroForm" action="{% url 'crear_registro' %}" method="post">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                      <label for="txtLitros" class="form-label text-white">Litros:</label>
+                      <input type="text" class="form-control" id="txtLitros" name="txtLitros">
+                  </div>
+                  <div class="mb-3">
+                      <label for="cmbCodigo" class="form-label text-white">Código:</label><br>
+                      <select id="cmbCodigo" name="cmbCodigo" class="form-control" required>
+                          <option value="" disabled selected>Seleccione un código...</option>
+                          {% for planta in codigo_plantas %}
+                              <option value="{{ planta.clave }}">{{ planta.clave }}</option>
+                          {% endfor %}
+                      </select>
+                      <br><br>
+                  </div>
+                  <div class="mb-3">
+                      <label for="cmbProducto" class="form-label text-white">Producto:</label><br>
+                      <select id="cmbProducto" name="cmbProducto" class="form-control" required>
+                          <option value="" disabled selected>Seleccione un producto...</option>
+                      </select>
+                      <br><br>
+                  </div>
+                  <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300;" value="Enviar" disabled>
+                  <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
+              </form>
+          </div>
       </div>
-      <div class="mb-3">
-        <label for="cmbCodigo" class="form-label text-white">Codigo:</label><br>
-        <select id="cmbCodigo" name="cmbCodigo" required>
-          {% for choice in CODIGO_CHOICES %}
-            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
-          {% endfor %}
-        </select>
-        <br><br>
-      </div>
-      <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300; value="Enviar">
-      <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
-      
-
-</form>
-</div>
-</div>
-</div>
+  </div>
 </div>
 
 {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
+  {% for message in messages %}
+      <div class="alert alert-danger" role="alert">
+          {{ message }}
+      </div>
+  {% endfor %}
 {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const cmbCodigo = document.getElementById('cmbCodigo');
+      const cmbProducto = document.getElementById('cmbProducto');
+      const btnEnviar = document.querySelector('input[type="submit"]');
+      const productosJSON = JSON.parse('{{ productos_json|escapejs }}');
+    console.log('Productos JSON:', '{{ productos_json|safe }}');
+
+      cmbCodigo.addEventListener('change', function() {
+          const codigoClave = cmbCodigo.value;
+
+          // Limpiar opciones previas
+          cmbProducto.innerHTML = '<option value="" disabled selected>Seleccione un producto...</option>';
+
+          // Filtrar productos para el código seleccionado
+          const productosFiltrados = productosJSON.filter(producto => producto.codigo === codigoClave);
+          productosFiltrados.forEach(function(producto) {
+              const option = document.createElement('option');
+              option.value = producto.id;
+              option.textContent = producto.nombre;
+              cmbProducto.appendChild(option);
+          });
+
+          // Habilitar el botón de enviar si se selecciona un producto válido
+          btnEnviar.disabled = false;
+      });
+
+      // Deshabilitar el botón de enviar al inicio
+      btnEnviar.disabled = true;
+
+      // Si cmbCodigo tiene un valor seleccionado inicialmente, simular el cambio para cargar productos
+      if (cmbCodigo.value) {
+          cmbCodigo.dispatchEvent(new Event('change'));
+      }
+  });
+</script>
+
 
 {% endblock %}

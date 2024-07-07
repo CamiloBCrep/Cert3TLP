@@ -26,6 +26,7 @@ urlpatterns = [
     path('logout/', views.exit, name="exit" ),
     path('nuevoRegistro/', views.crear_registro, name="crear_registro"),
     path('editarRegistro/<int:pk>/', views.editar_registro, name='editar_registro'),
+    path('eliminarRegistro/<int:pk>/', views.eliminar_registro, name='eliminar_registro'),
     path('home/', views.listar_registros, name='listar_registros' ),   
     path('api/', include('restAPI.urls')),
 ]

@@ -33,9 +33,10 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Código</th>
+                    <th scope="col">Planta</th>
                     <th scope="col">Litros</th>
-                    <th scope="col">Fecha y hora</th>
+                    <th scope="col">Creacion</th>
+                    <th scope="col">Ultima modificación</th>
                     <th scope="col">Operario</th>
                     <th scope="col">Turno</th>
                     <th scope="col">Acciones</th>
@@ -43,18 +44,22 @@
             </thead>
             <tbody>
                 {% for registro in registros %}
-                <tr>
-                    <td>{{ registro.codigo }}</td>
-                    <td>{{ registro.litros }}</td>
-                    <td>{{ registro.fecha_hora }}</td>
-                    <td>{{ registro.operario }}</td>
-                    <td>{{ registro.turno }}</td>
-                    <td>
-                        {% if registro.operario == request.user %}
-                            <a href="{% url 'editar_registro' registro.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                        {% endif %}
-                    </td>
-                </tr>
+                    {% if registro.eliminado == False%}
+                        <tr>
+                            <td>{{ registro.codigo }}</td>
+                            <td>{{ registro.litros }}</td>
+                            <td>{{ registro.fecha_hora }}</td>
+                            <td>{{ registro.fecha_modificacion }}</td>
+                            <td>{{ registro.operario }}</td>
+                            <td>{{ registro.turno }}</td>
+                            <td>
+                                {% if registro.operario == request.user %}
+                                    <a href="{% url 'editar_registro' registro.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'eliminar_registro' registro.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% empty %}
                 <tr>
                     <td colspan="6">No se encontraron registros.</td>

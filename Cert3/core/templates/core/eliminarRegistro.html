@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{title}}{% endblock %}
+
+{% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
+{% block content %}
+
+<br><br>
+<body>
+    <h2>¿Estás seguro de que deseas eliminar este registro?</h2>
+    <p>{{ registro.codigo }} - {{ registro.litros }} litros - {{ registro.fecha_hora }}</p>
+    
+    <form action="{% url 'eliminar_registro' registro.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmar Eliminación</button>
+    </form>
+
+    <a href="{% url 'home' %}">Cancelar</a>
+</body>
+</html>
+
+
+{% endblock %}

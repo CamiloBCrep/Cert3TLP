@@ -1,9 +1,10 @@
 from django.contrib.auth import logout
-from .models import combustible,CODIGO_CHOICES
+from .models import combustible, codigoPlanta, producto
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-import datetime
+from django.utils import timezone
+import datetime, json
 # Create your views here.
 def home(request):
     title = "inicio"
@@ -32,16 +33,27 @@ def exit(request):
     logout(request)
     return redirect('home')
 
+
+
 def crear_registro(request):
     
+    plantas = codigoPlanta.objects.all()
+    
+    productos_json = json.dumps(list(plantas.values())) 
+    
     context = {
-        'CODIGO_CHOICES': CODIGO_CHOICES,
+        'codigo_plantas': plantas,
+        'productos_json': productos_json
     }
 
     if request.method == 'POST':
 
-        codigo = request.POST.get('cmbCodigo')
+        codigo_clave = request.POST.get('cmbCodigo')
         litros = request.POST.get('txtLitros')
+        producto_id = request.POST.get('cmbProducto')  # Cambiado a producto_id para evitar confusión con el nombre 'producto'
+        
+        codigo = codigoPlanta.objects.get(clave=codigo_clave)
+        producto_seleccionado = producto.objects.get(id=producto_id)  # Obtener el objeto producto
         
         now = datetime.datetime.now()
 
@@ -52,12 +64,13 @@ def crear_registro(request):
         else:
             turno = 'PM'
 
-        if not codigo or not litros:
+        if not codigo or not litros or not producto_seleccionado:
             messages.error(request, 'Por favor completa todos los campos del formulario.')
         else:
             combust = combustible(
                 codigo=codigo,
                 litros=litros,
+                producto=producto_seleccionado,  # Asignar el objeto producto obtenido
                 operario=request.user,
                 turno=turno
             )
@@ -89,29 +102,53 @@ def listar_registros(request):
     return render(request, 'core/home.html', context)
 
 def editar_registro(request, pk):
-
     registro = get_object_or_404(combustible, pk=pk)
+    plantas = codigoPlanta.objects.all()
+    
 
     # Verificar que el usuario actual sea el operario del registro
     if registro.operario != request.user:
-        # Puedes manejar el acceso no autorizado como desees
         return redirect('listar_registros')
 
     if request.method == 'POST':
         litros = request.POST.get('txtLitros')
-        codigo = request.POST.get('cmbCodigo')
+        codigo_clave = request.POST.get('cmbCodigo')
+        producto = request.POST.get('cmbProducto')
 
+        # Obtener el objeto codigoPlanta correspondiente a la clave
+        codigo = codigoPlanta.objects.get(clave=codigo_clave)
+        
         # Validaciones adicionales según tus requisitos
         if litros:
             registro.litros = litros
-        if codigo:
-            registro.codigo = codigo
+
+        # Asignar el objeto codigoPlanta al campo codigo del registro
+        registro.codigo = codigo
+        registro.producto = producto
+        registro.fecha_modificacion = timezone.now()    
+        registro.usuario_modificador = request.user
 
         registro.save()
         return redirect('listar_registros')
 
     context = {
-        'CODIGO_CHOICES': CODIGO_CHOICES,
+        'codigo_plantas': plantas,
         'registro': registro,
     }
     return render(request, 'core/formularioEditarRegistro.html', context)
+
+def eliminar_registro(request, pk):
+    
+    registro = get_object_or_404(combustible, pk=pk)
+
+    if request.method == 'POST':
+        registro.eliminar()  # Llamar al método de eliminación lógica
+        registro.fecha_modificacion = timezone.now()
+        registro.usuario_modificador = request.user
+        registro.save()
+        return redirect('listar_registros')
+
+    context = {
+        'registro': registro
+    }
+    return render(request, 'core/eliminarRegistro.html', context)
