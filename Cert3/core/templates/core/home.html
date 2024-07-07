@@ -13,8 +13,8 @@
         <div class="text-center" style="margin-top: 10vh;">
             <div class="row">
                 <div class="col">
-                    <h3 style="color: #e5b300; margin-bottom: -2vh;">Portafolio</h3>
-                    <h1 style="margin-top: 2px;">Proyectos presentados</h1>
+                    <h3 style="color: #e5b300; margin-bottom: -2vh;">Compec</h3>
+                    <h1 style="margin-top: 2px;">Tabla de registros</h1>
                 </div>
             </div>
         </div>
@@ -33,7 +33,9 @@
         <table class="table table-striped">
             <thead>
                 <tr>
+                    <th scope="col">Registro</th>
                     <th scope="col">Planta</th>
+                    <th scope="col">Producto</th>
                     <th scope="col">Litros</th>
                     <th scope="col">Creacion</th>
                     <th scope="col">Ultima modificación</th>
@@ -46,7 +48,9 @@
                 {% for registro in registros %}
                     {% if registro.eliminado == False%}
                         <tr>
+                            <td>{{ registro.id }}</td>
                             <td>{{ registro.codigo }}</td>
+                            <td>{{ registro.producto}}</td>
                             <td>{{ registro.litros }}</td>
                             <td>{{ registro.fecha_hora }}</td>
                             <td>{{ registro.fecha_modificacion }}</td>

@@ -5,45 +5,94 @@
 {% comment %} {% block h2 %}{{title}}{% endblock %} {% endcomment %}
 {% block content %}
 <br><br>
-
 <div class="container-fluid" style="background-color: #074469; height: 100vh; width: auto;">
     <br>
     <h2 class="text-center text-white">Editar Registro</h2>
+    <br>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-4">
-
-            <form action="" method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <div class="mb-3">
-                    <label for="txtLitros" class="form-label text-white">Litros:</label>
-                    <input type="text" class="form-control" id="txtLitros" name="txtLitros">
-                </div>
-                <div class="mb-3">
-                    <label for="cmbCodigo" class="form-label text-white">Codigo:</label><br>
-                    <select id="cmbCodigo" name="cmbCodigo" required>
-                    {% for planta in codigo_plantas %}
-                        <option value="{{ planta.clave }}">{{ planta.clave }}</option>
-                    {% endfor %}
-                    </select>
-                    <br><br>
-                </div>
-                <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300;" value="Guardar">
-                <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
-            </form>
+                <form id="editarRegistroForm" action="{% url 'editar_registro' pk=registro.pk %}" method="post">
+                    <h3 class="text-white text-center">Información del registro: </h3>
+                    <p class="text-white">Planta: {{ registro.codigo }} <br> Producto: {{ registro.producto}} <br> Litros: {{ registro.litros }} <br> Ultima modificación: {{ registro.fecha_modificacion }}<br></p>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="txtLitros" class="form-label text-white">Litros:</label>
+                        <input type="text" class="form-control" id="txtLitros" name="txtLitros" value="{{ registro.litros }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cmbCodigo" class="form-label text-white">Código:</label><br>
+                        <select id="cmbCodigo" name="cmbCodigo" class="form-control" required>
+                            <option value="" disabled selected>Seleccione un código...</option>
+                            {% for planta in codigo_plantas %}
+                            <option value="{{ planta.clave }}" {% if planta.clave == registro.codigo.clave %} selected {% endif %}>{{ planta.clave }} - {{planta.descripcion}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cmbProducto" class="form-label text-white">Producto:</label><br>
+                        <select id="cmbProducto" name="cmbProducto" class="form-control" required>
+                            <option value="" disabled selected>Seleccione un producto...</option>
+                            {% for producto in registro.codigo.productos.all %}
+                            <option value="{{ producto.id }}" {% if producto.id == registro.producto.id %} selected {% endif %}>{{ producto.nombre }} - {{producto.descripcion}}</option>
+                            {% endfor %}
+                        </select>
+                        <br><br>
+                    </div>
+                    <input class="btn btn-primary" type="submit" style="background-color: #e5b300; border-color: #e5b300;" value="Editar" disabled>
+                    <a href="{% url 'listar_registros' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-
 {% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
 {% endif %}
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cmbCodigo = document.getElementById('cmbCodigo');
+        const cmbProducto = document.getElementById('cmbProducto');
+        const btnEnviar = document.querySelector('input[type="submit"]');
+        const plantasJson = JSON.parse('{{ plantas_json|escapejs }}');
+        console.log("datos plantas", plantasJson);
+
+        cmbCodigo.addEventListener('change', function() {
+            const codigoClave = cmbCodigo.value;
+
+            // Encontrar la planta seleccionada en el JSON
+            const plantaSeleccionada = plantasJson.find(planta => planta.clave === codigoClave);
+
+            // Limpiar opciones previas
+            cmbProducto.innerHTML = '<option value="" disabled selected>Seleccione un producto...</option>';
+
+            // Agregar opciones de productos para la planta seleccionada
+            plantaSeleccionada.productos.forEach(function(producto) {
+                const option = document.createElement('option');
+                option.value = producto.id;
+                option.textContent = producto.nombre+' - '+producto.descripcion;
+                cmbProducto.appendChild(option);
+            });
+
+            // Habilitar el botón de enviar si se selecciona un producto válido
+            btnEnviar.disabled = false;
+        });
+
+        // Deshabilitar el botón de enviar al inicio
+        btnEnviar.disabled = true;
+
+        // Si cmbCodigo tiene un valor seleccionado inicialmente, simular el cambio para cargar productos
+        if (cmbCodigo.value) {
+            cmbCodigo.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+
+
+  
 {% endblock %}

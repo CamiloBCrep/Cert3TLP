@@ -16,7 +16,8 @@ class codigoPlanta(models.Model):
     productos = models.ManyToManyField(producto, related_name='codigos')
 
     def __str__(self):
-        return f'{self.clave} - {self.descripcion}'
+        #return f'{self.clave} - {self.descripcion}'
+        return self.clave
     
 TURNO_CHOICES = (('AM','AM'),
                  ('PM','PM'),

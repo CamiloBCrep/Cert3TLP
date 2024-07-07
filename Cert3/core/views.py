@@ -36,49 +36,69 @@ def exit(request):
 
 
 def crear_registro(request):
-    
     plantas = codigoPlanta.objects.all()
+
+    # Crear una lista para almacenar los datos de cada código de planta con sus productos
+    plantas_json = []
+    for planta in plantas:
+        # Obtener los productos asociados a cada código de planta y convertirlos a listas de Python
+        productos = list(planta.productos.all().values())
+        
+        # Crear un diccionario con la información del código de planta y sus productos
+        planta_data = {
+            'clave': planta.clave,
+            'descripcion': planta.descripcion,
+            'productos': productos
+        }
+        
+        # Agregar el diccionario a la lista de plantas en formato JSON
+        plantas_json.append(planta_data)
     
-    productos_json = json.dumps(list(plantas.values())) 
-    
+    # Convertir la lista de plantas en formato JSON
+    plantas_json_str = json.dumps(plantas_json)
+
     context = {
         'codigo_plantas': plantas,
-        'productos_json': productos_json
+        'plantas_json': plantas_json_str
     }
 
     if request.method == 'POST':
-
         codigo_clave = request.POST.get('cmbCodigo')
         litros = request.POST.get('txtLitros')
-        producto_id = request.POST.get('cmbProducto')  # Cambiado a producto_id para evitar confusión con el nombre 'producto'
-        
-        codigo = codigoPlanta.objects.get(clave=codigo_clave)
-        producto_seleccionado = producto.objects.get(id=producto_id)  # Obtener el objeto producto
-        
-        now = datetime.datetime.now()
+        producto_id = request.POST.get('cmbProducto')  # Debe ser el id del producto
 
-        if now.hour < 6:
-            turno = 'MM'
-        elif now.hour < 12:
-            turno = 'AM'
-        else:
-            turno = 'PM'
+        try:
+            codigo_planta = codigoPlanta.objects.get(clave=codigo_clave)
+            producto_seleccionado = producto.objects.get(id=producto_id)  # Obtener el producto por su id
 
-        if not codigo or not litros or not producto_seleccionado:
-            messages.error(request, 'Por favor completa todos los campos del formulario.')
-        else:
-            combust = combustible(
-                codigo=codigo,
-                litros=litros,
-                producto=producto_seleccionado,  # Asignar el objeto producto obtenido
-                operario=request.user,
-                turno=turno
-            )
+            if not codigo_planta or not litros or not producto_seleccionado:
+                messages.error(request, 'Por favor completa todos los campos del formulario.')
+            else:
+                now = datetime.datetime.now()
+                if now.hour < 6:
+                    turno = 'MM'
+                elif now.hour < 12:
+                    turno = 'AM'
+                else:
+                    turno = 'PM'
+
+                combust = combustible(
+                    codigo=codigo_planta,
+                    litros=litros,
+                    producto=producto_seleccionado,
+                    operario=request.user,
+                    turno=turno
+                )
             
-            combust.save()
+                combust.save()
 
-            messages.success(request, '¡El registro se ha creado exitosamente!')
-            return redirect('home')  # Ajusta esta redirección según tu configuración de URLs
+                messages.success(request, '¡El registro se ha creado exitosamente!')
+                return redirect('home')  # Redirigir a la página de inicio
+
+        except codigoPlanta.DoesNotExist:
+            messages.error(request, 'El código de planta seleccionado no es válido.')
+        except producto.DoesNotExist:
+            messages.error(request, 'El producto seleccionado no es válido.')
 
     return render(request, 'core/formulario.html', context)
 
@@ -101,10 +121,36 @@ def listar_registros(request):
 
     return render(request, 'core/home.html', context)
 
+
+
 def editar_registro(request, pk):
     registro = get_object_or_404(combustible, pk=pk)
     plantas = codigoPlanta.objects.all()
+
+    # Crear una lista para almacenar los datos de cada código de planta con sus productos
+    plantas_json = []
+    for planta in plantas:
+        # Obtener los productos asociados a cada código de planta y convertirlos a listas de Python
+        productos = list(planta.productos.all().values())
+        
+        # Crear un diccionario con la información del código de planta y sus productos
+        planta_data = {
+            'clave': planta.clave,
+            'descripcion': planta.descripcion,
+            'productos': productos,
+        }
+        
+        # Agregar el diccionario a la lista de plantas en formato JSON
+        plantas_json.append(planta_data)
     
+    # Convertir la lista de plantas en formato JSON
+    plantas_json_str = json.dumps(plantas_json)
+
+    context = {
+        'codigo_plantas': plantas,
+        'plantas_json': plantas_json_str,
+        'registro': registro
+    }
 
     # Verificar que el usuario actual sea el operario del registro
     if registro.operario != request.user:
@@ -113,28 +159,33 @@ def editar_registro(request, pk):
     if request.method == 'POST':
         litros = request.POST.get('txtLitros')
         codigo_clave = request.POST.get('cmbCodigo')
-        producto = request.POST.get('cmbProducto')
+        producto_id = request.POST.get('cmbProducto')
 
-        # Obtener el objeto codigoPlanta correspondiente a la clave
-        codigo = codigoPlanta.objects.get(clave=codigo_clave)
-        
-        # Validaciones adicionales según tus requisitos
-        if litros:
-            registro.litros = litros
+        # Validar que los campos recibidos no estén vacíos
+        if litros and codigo_clave and producto_id:
+            try:
+                codigo = codigoPlanta.objects.get(clave=codigo_clave)
+                producto_seleccionado = producto.objects.get(id=producto_id)
 
-        # Asignar el objeto codigoPlanta al campo codigo del registro
-        registro.codigo = codigo
-        registro.producto = producto
-        registro.fecha_modificacion = timezone.now()    
-        registro.usuario_modificador = request.user
+                # Actualizar los campos del registro existente
+                registro.litros = litros
+                registro.codigo = codigo
+                registro.producto = producto_seleccionado
+                registro.fecha_modificacion = timezone.now()
+                registro.usuario_modificador = request.user
 
-        registro.save()
-        return redirect('listar_registros')
+                registro.save()
 
-    context = {
-        'codigo_plantas': plantas,
-        'registro': registro,
-    }
+                messages.success(request, '¡El registro se ha actualizado exitosamente!')
+                return redirect('listar_registros')
+
+            except codigoPlanta.DoesNotExist:
+                messages.error(request, 'El código de planta seleccionado no es válido.')
+            except producto.DoesNotExist:
+                messages.error(request, 'El producto seleccionado no es válido.')
+        else:
+            messages.error(request, 'Por favor completa todos los campos del formulario.')
+
     return render(request, 'core/formularioEditarRegistro.html', context)
 
 def eliminar_registro(request, pk):
