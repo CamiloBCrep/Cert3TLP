@@ -127,3 +127,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'

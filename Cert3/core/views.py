@@ -5,6 +5,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils import timezone
 import datetime, json
+from django.conf import settings
+from slack_sdk import WebClient
+from django.db.models import Sum
+import requests
+
+
 # Create your views here.
 def home(request):
     title = "inicio"
@@ -33,7 +39,36 @@ def exit(request):
     logout(request)
     return redirect('home')
 
+import requests
+from django.conf import settings
 
+def enviar_notificacion_slack(registro):
+    try:
+        webhook_url = settings.SLACK_WEBHOOK_URL
+
+        # Construir el mensaje en formato JSON
+        mensaje = {
+            "text": f"{registro.fecha_hora.strftime("%d-%m-%Y %H:%M")} | {registro.codigo.clave} – Nuevo Registro de Producción – "
+                    f"{registro.producto.nombre} {registro.litros} litros registrados | "
+                    f"Total Almacenado: {calcular_total_almacenado()} litros"
+        }
+
+        # Enviar mensaje a Slack usando requests
+        response = requests.post(webhook_url, json=mensaje)
+
+        if response.status_code == 200:
+            print("Notificación enviada exitosamente a Slack.")
+        else:
+            print(f"Error al enviar notificación a Slack. Código de error: {response.status_code}")
+
+    except Exception as e:
+        print(f"Error al enviar notificación a Slack: {str(e)}")
+
+def calcular_total_almacenado():
+    # Calcular el total almacenado sumando todos los litros de los registros
+    registros = combustible.objects.filter(eliminado=False)
+    total = registros.aggregate(Sum('litros'))['litros__sum'] or 0
+    return total
 
 def crear_registro(request):
     plantas = codigoPlanta.objects.all()
@@ -56,6 +91,11 @@ def crear_registro(request):
     
     # Convertir la lista de plantas en formato JSON
     plantas_json_str = json.dumps(plantas_json)
+    total_almacenado = calcular_total_almacenado() #slack aqui
+
+    context = {
+        'total_almacenado': total_almacenado
+    }
 
     context = {
         'codigo_plantas': plantas,
@@ -91,6 +131,8 @@ def crear_registro(request):
                 )
             
                 combust.save()
+                enviar_notificacion_slack(combust) #slack aqui
+
 
                 messages.success(request, '¡El registro se ha creado exitosamente!')
                 return redirect('home')  # Redirigir a la página de inicio
