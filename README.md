@@ -4,5 +4,8 @@
 <p>Las notificaciones Slack para funcionar requiere webhook de aplicación.</p> 
 <br>
 <p>instalaciones necesarias:</p><br>
-```pip install requests```
-`pip install slack_sdk`
+
+```
+pip install requests
+pip install slack_sdk
+```
