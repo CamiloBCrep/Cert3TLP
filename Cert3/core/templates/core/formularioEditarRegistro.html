@@ -46,12 +46,14 @@
         </div>
     </div>
 </div>
+
+
 {% if messages %}
-{% for message in messages %}
-<div class="alert alert-danger" role="alert">
-    {{ message }}
-</div>
-{% endfor %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
 {% endif %}
 
 <script>

@@ -39,9 +39,6 @@ def exit(request):
     logout(request)
     return redirect('home')
 
-import requests
-from django.conf import settings
-
 def enviar_notificacion_slack(registro):
     try:
         webhook_url = settings.SLACK_WEBHOOK_URL
@@ -162,8 +159,6 @@ def listar_registros(request):
     }
 
     return render(request, 'core/home.html', context)
-
-
 
 def editar_registro(request, pk):
     registro = get_object_or_404(combustible, pk=pk)
