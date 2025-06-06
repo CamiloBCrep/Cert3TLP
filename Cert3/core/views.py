@@ -45,7 +45,8 @@ def enviar_notificacion_slack(registro):
 
         # Construir el mensaje en formato JSON
         mensaje = {
-            "text": f"{registro.fecha_hora.strftime("%d-%m-%Y %H:%M")} | {registro.codigo.clave} – Nuevo Registro de Producción – "
+            "text": f"{registro.fecha_hora.strftime('%d-%m-%Y %H:%M')} | {registro.codigo.clave} – Nuevo Registro de Producción – "
+
                     f"{registro.producto.nombre} {registro.litros} litros registrados | "
                     f"Total Almacenado: {calcular_total_almacenado()} litros"
         }

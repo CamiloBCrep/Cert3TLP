@@ -8,4 +8,5 @@
 ```
 pip install requests
 pip install slack_sdk
+pip install djangorestframework
 ```
